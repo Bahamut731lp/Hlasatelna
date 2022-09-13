@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hlasatelna - Trestné Střílení</title>
+    <link rel="stylesheet" href="dist/output.css">
+</head>
+
+<body class="bg-neutral-900 text-white p-16">
+
+    <a href="index.html"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Zpátky</a>
+
+    <section class="py-8">
+
+        <section class="grid grid-cols-3 gap-4 items-center">
+
+            <label class="text-white text-sm font-medium">Střílí hráč družstva</label>
+            <label class="text-white text-sm font-medium">Čas</label>
+            <label class="text-white text-sm font-medium">Číslo hráče</label>
+
+            <div class="flex flex-col">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                        <input checked id="bordered-radio-1" type="radio" value="0" name="prestupek_tymu"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
+                        <label for="bordered-radio-1"
+                            class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                    </div>
+                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                        <input id="bordered-radio-2" type="radio" value="1" name="prestupek_tymu"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
+                        <label for="bordered-radio-2"
+                            class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div>
+                <div class="mt-1">
+                    <input id="cas_strileni" type="text" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <div class="mt-1 relative">
+                    <input id="hrac" name="number" type="number" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>. Trestné střílení za družstvo
+        <span id="zprava_tym" class="text-blue-600"></span> provede <span id="zprava_hrac"></span>.
+    </h1>
+
+    <script src="assets/autoComplete.min.js"></script>
+    <script>
+        
+        fetch("http://localhost:8080", {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                const tymy = res.tymy;
+                const indexDomaci = +(res.tymy[0].strana.toUpperCase() != "DOMÁCÍ");
+                const indexHosti = +!indexDomaci;
+
+                let index = document.querySelector('input[name="prestupek_tymu"]:checked').value;
+
+                const poleCas = document.getElementById("zprava_cas");
+                const poleHrac = document.getElementById("zprava_hrac");
+                const poleTym = document.getElementById("zprava_tym");
+
+                function vykresliHrace(cisloHrace) {
+
+                    if (!(cisloHrace ?? false)) {
+                        poleHrac.innerHTML = " ? "
+                        return;
+                    }
+
+                    if (cisloHrace in tymy[index].hraci) {
+                        let hrac = tymy[index].hraci[cisloHrace];
+                        poleHrac.innerHTML = `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`
+                    }
+                    else {
+                        poleHrac.innerHTML = `<span class="text-red-500">hráč číslo ${cisloHrace}</span>`;
+                    }
+                }
+
+                function vykresliDrustvo(cisloDruzstva) {
+                    poleTym.innerText = tymy[cisloDruzstva].jmeno;
+                }
+
+                function vykresliVsechno() {
+                    vykresliHrace(document.getElementById("hrac").value);
+                    vykresliDrustvo(index);
+                }
+
+                document.getElementById("hrac").addEventListener("input", (event) => vykresliHrace(event.target.value));
+                document.getElementById("cas_strileni").addEventListener("input", (event) => {
+                    let chars = event.target.value.split("");
+                    chars.splice(2, 0, ":");
+
+                    poleCas.innerText = chars.join("");
+                });
+
+                document.querySelectorAll(`input[name="prestupek_tymu"]`).forEach(input => input.addEventListener("input", (event) => {
+                    index = Number(event.target.value);
+                    vykresliVsechno();
+                }));
+
+                document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
+                document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);
+
+                vykresliVsechno();
+            })
+    </script>
+</body>
+
+</html>

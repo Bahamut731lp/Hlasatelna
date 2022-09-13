@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hlasatelna</title>
+    <link rel="stylesheet" href="dist/output.css">
+</head>
+<body class="flex bg-neutral-900 min-h-screen">
+    
+    <main class="flex flex-1 flex-col gap-4 justify-center h-screen p-16">
+        <section class="flex gap-4">
+            <a href="intro.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <h1 class="text-center">Intro + Sestavy</h1>
+            </a>
+            <a href="lineup.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <h1 class="text-center">Lineup a Rozhodčí</h1>
+            </a>
+        </section>
+
+        <section class="flex gap-4">
+            <a href="branka.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <h1 class="text-center">Branka</h1>
+            </a>
+            <a href="vylouceni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <h1 class="text-center">Trest vyloučení</h1>
+            </a>
+            <a href="strileni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <h1 class="text-center">Trestné střílení</h1>
+            </a>
+        </section>
+    </main>
+
+    <aside class="px-16 w-1/3 max-h-screen overflow-y-hidden">
+        <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Event Log</h1>
+        <ul id="event_log" class="overflow-y-scroll h-5/6 border border-gray-200">
+
+        </ul>
+    </aside>
+
+    <script>
+        const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
+
+        if (events.length > 0) {
+            const HTML = events.map(event => (
+                `<li class="text-white flex items-center gap-4 py-4 px-2 even:bg-neutral-800">
+                    <span>${event.time}</span>
+                    ${event.icon ? `<img class="w-4 h-4 object-contain" src="assets/icons/${event.icon}">` : ""}
+                    <p class="font-bold">${event.label}<p>
+                </li>`
+            )).join("\n");
+
+            document.getElementById("event_log").innerHTML = HTML;
+        }
+        
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="dist/output.css">
+</head>
+
+<body class="bg-neutral-900 text-white p-16">
+
+    <a href="index.html"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Zpátky</a>
+
+    <section class="py-8">
+        <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            Dámy a pánové, <br>
+            za chvíli začíná utkání <span id="soutez" class="text-blue-600 dark:text-blue-500"></span>, ve kterém se
+            střetne tým
+            <span class="domaci text-blue-600 dark:text-blue-500"></span>
+            s týmem
+            <span class="hosti text-blue-600 dark:text-blue-500"></span>.
+
+            Dovolte mi představit vám jejich hráče.
+        </h1>
+    </section>
+
+    <hr class="my-12">
+    <section class="grid grid-cols-2 gap-8">
+        <div>
+            <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                Za tým <span class="hosti text-blue-600 dark:text-blue-500"></span> dnes nastoupí
+            </h1>
+            <ul id="hosti_hraci" class="text-2xl border border-neutral-600"></ul>
+        </div>
+
+        <div>
+            <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                a za tým <span class="domaci text-blue-600 dark:text-blue-500"></span> dnes nastoupí
+            </h1>
+            <ul id="domaci_hraci" class="text-2xl border border-neutral-600"></ul>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-2 gap-8">
+        <ul id="hosti_realizace" class="my-4 text-2xl border border-neutral-600"></ul>
+        <ul id="domaci_realizace" class="my-4 text-2xl border border-neutral-600"></ul>
+    </section>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Děkujeme, že jste se přišli podívat na toto utkání a přejeme Vám příjemnou zábavu.
+    </h1>
+
+    <script src="assets/eventlog.js"></script>
+    <script>
+
+        addEventLog({
+            id: "intro",
+            time: "-10:00",
+            label: "Základní informace a sestavy družstev",
+            icon: "period-icon.png"
+        });
+
+        fetch("http://localhost:8080", {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                const utkani = res.utkani;
+                const indexDomaci = +(res.tymy[0].strana.toUpperCase() != "DOMÁCÍ");
+                const indexHosti = +!indexDomaci;
+
+                document.getElementById("soutez").innerText = res.utkani
+                document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
+                document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);
+
+                document.getElementById("hosti_hraci").innerHTML = Object.values(res.tymy[indexHosti].hraci).map(hrac => `<li class="px-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span></li>`).join("\n")
+                document.getElementById("hosti_realizace").innerHTML = Object.keys(res.tymy[indexHosti].realizacni).map((jmeno) => `<li class="px-2.5 even:bg-neutral-700">${res.tymy[indexHosti].realizacni[jmeno]} týmu je pan(í) <span class="tracking-wide uppercase">${jmeno}</span></li>`).join("\n")
+                
+                document.getElementById("domaci_hraci").innerHTML = Object.values(res.tymy[indexDomaci].hraci).map(hrac => `<li class="px-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span></li>`).join("\n")
+                document.getElementById("domaci_realizace").innerHTML = Object.keys(res.tymy[indexDomaci].realizacni).map((jmeno) => `<li class="px-2.5 even:bg-neutral-700">${res.tymy[indexDomaci].realizacni[jmeno]} týmu je pan(í) <span class="tracking-wide uppercase">${jmeno}</span></li>`).join("\n")
+            })
+
+
+    </script>
+</body>
+
+</html>

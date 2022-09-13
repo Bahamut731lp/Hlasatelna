@@ -1,0 +1,1 @@
+start chrome "$(pwd)/frontend/index.html" & hlasatelna $1

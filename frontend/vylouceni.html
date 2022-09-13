@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hlasatelna - Trest Vyloučení</title>
+    <link rel="stylesheet" href="dist/output.css">
+</head>
+
+<body class="bg-neutral-900 text-white p-16">
+
+    <a href="index.html"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Zpátky</a>
+
+    <section class="py-8">
+
+        <section class="grid grid-cols-5 gap-4 items-center">
+
+            <label class="text-white text-sm font-medium">Vyloučen hráč z týmu</label>
+            <label class="text-white text-sm font-medium">Čas</label>
+            <label class="text-white text-sm font-medium">Číslo hráče</label>
+            <label class="text-white text-sm font-medium">Přestupek</label>
+            <label class="text-white text-sm font-medium">Délka trestu</label>
+
+            <div class="flex flex-col">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                        <input checked id="bordered-radio-1" type="radio" value="0" name="prestupek_tymu"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
+                        <label for="bordered-radio-1"
+                            class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                    </div>
+                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                        <input id="bordered-radio-2" type="radio" value="1" name="prestupek_tymu"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
+                        <label for="bordered-radio-2"
+                            class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div>
+                <div class="mt-1">
+                    <input id="cas_vylouceni" type="text" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <div class="mt-1 relative">
+                    <input id="hrac" name="number" type="number" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <div class="mt-1 relative">
+                    <input id="prestupek" name="email" type="text" required="" autocomplete="off"
+                        class="relative block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <div class="mt-1 relative">
+                    <input id="delka_trestu" name="email" type="text" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        V čase <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span> byl vyloučen 
+        <span id="zprava_hrac"></span> družstva
+        <span id="zprava_tym" class="text-blue-600"></span> na
+        <span id="zprava_delka_trestu" class="text-blue-600"></span> za
+        <span id="zprava_prestupek" class="text-blue-600"></span>
+    </h1>
+
+    <script src="assets/autoComplete.min.js"></script>
+    <script>
+        const enhancedAutocomplete = (placeholder, selector, pole, data) => {
+            const autoCompleteJS = new autoComplete({
+                    placeHolder: placeholder,
+                    selector,
+                    wrapper: false,
+                    submit: true,
+                    data: {
+                        src: data
+                    },
+                    resultsList: {
+                        class: `absolute top-full bg-white text-black w-full`
+                    },
+                    resultItem: {
+                        highlight: true,
+                        class: "p-2 cursor-pointer hover:bg-neutral-100",
+                    },
+                    diacritics: true
+                });
+
+                autoCompleteJS.input.addEventListener("selection", (event) => {
+                    const feedback = event.detail;
+                    const selection = feedback.selection.value;
+
+                    autoCompleteJS.input.blur();
+                    autoCompleteJS.input.value = selection;
+                    pole.innerHTML = selection;
+                });
+
+                autoCompleteJS.input.addEventListener("keydown", (event) => {
+                    console.log(event);
+                    
+                    if (event.key.toUpperCase() == "TAB" && autoCompleteJS.feedback?.matches?.length > 0) {
+                        let suggestion = autoCompleteJS.feedback.matches[0].value;
+                        autoCompleteJS.input.value = suggestion;
+                        pole.innerHTML = suggestion;
+                    }
+                })
+        }
+
+
+        fetch("http://localhost:8080", {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                const tymy = res.tymy;
+                const indexDomaci = +(res.tymy[0].strana.toUpperCase() != "DOMÁCÍ");
+                const indexHosti = +!indexDomaci;
+
+                let index = document.querySelector('input[name="prestupek_tymu"]:checked').value;
+
+                const poleCas = document.getElementById("zprava_cas");
+                const poleHrac = document.getElementById("zprava_hrac");
+                const poleTym = document.getElementById("zprava_tym");
+                const poleDelkaTrestu = document.getElementById("zprava_delka_trestu");
+                const polePrestupek = document.getElementById("zprava_prestupek");
+
+                const prestupky = [
+                    "Sekání",
+                    "Blokování soupeřovy florbalky",
+                    "Zvedání soupeřovy florbalky",
+                    "Vysoká florbalka",
+                    "Vložení florbalky, chodidla či nohy mezi soupeřovy nohy",
+                    "Hákování",
+                    "Nedovolené vrážení",
+                    "Vrážení zády do soupeře",
+                    "Hrubost",
+                    "Držení",
+                    "Bránění ve hře",
+                    "Nesprávné kopnutí",
+                    "Vysoký kop",
+                    "Vstup do malého brankoviště",
+                    "Nedovolená vzdálenost",
+                    "Nedovolený výskok",
+                    "Nesprávný výhoz",
+                    "Špatně provedené rozehrání",
+                    "Hra vleže",
+                    "Ruka",
+                    "Hlavička",
+                    "Špatné střídání",
+                    "Opakované přestupky",
+                    "Zdržování hry",
+                    "Nesportovní chování"
+                ];
+
+                const delkyTrestu = [
+                    "2 minuty",
+                    "2 + 2 minuty",
+                    "2 minuty a osobní trest",
+                    "2 + 2 minuty a vyloučení do konce utkání"
+                ]
+
+                enhancedAutocomplete("Přestupek...", "#prestupek", polePrestupek, prestupky);
+                enhancedAutocomplete("Délka trestu...", "#delka_trestu", poleDelkaTrestu, delkyTrestu);
+
+                function vykresliHrace(cisloHrace) {
+
+                    if (!(cisloHrace ?? false)) {
+                        poleHrac.innerHTML = " ? "
+                        return;
+                    }
+
+                    if (cisloHrace in tymy[index].hraci) {
+                        let hrac = tymy[index].hraci[cisloHrace];
+                        poleHrac.innerHTML = `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`
+                    }
+                    else {
+                        poleHrac.innerHTML = `<span class="text-red-500">hráč číslo ${cisloHrace}</span>`;
+                    }
+                }
+
+                function vykresliDrustvo(cisloDruzstva) {
+                    poleTym.innerText = tymy[cisloDruzstva].jmeno;
+                }
+
+                function vykresliVsechno() {
+                    vykresliHrace(document.getElementById("hrac").value);
+                    vykresliDrustvo(index);
+                }
+
+                document.querySelectorAll(`input[name="prestupek_tymu"]`).forEach(input => input.addEventListener("input", (event) => {
+                    index = Number(event.target.value);
+                    vykresliVsechno();
+                }));
+
+                document.getElementById("hrac").addEventListener("input", (event) => vykresliHrace(event.target.value));
+                document.getElementById("cas_vylouceni").addEventListener("input", (event) => {
+                    let chars = event.target.value.split("");
+                    chars.splice(2, 0, ":");
+
+                    poleCas.innerText = chars.join("");
+                });
+                document.getElementById("prestupek").addEventListener("input", (event) => polePrestupek.innerHTML = event.target.value);
+                document.getElementById("delka_trestu").addEventListener("input", (event) => poleDelkaTrestu.innerHTML = event.target.value);
+
+                document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
+                document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);
+
+                vykresliVsechno();
+            })
+    </script>
+</body>
+
+</html>

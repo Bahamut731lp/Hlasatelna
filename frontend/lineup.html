@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="dist/output.css">
+</head>
+
+<body class="bg-neutral-900 text-white p-16">
+
+    <a href="index.html"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Zpátky</a>
+
+    <section class="py-8">
+        <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            Dámy a pánové, <br>
+            přivítejme na hřišti týmy <span class="domaci text-blue-600 dark:text-blue-500"></span> a <span class="hosti text-blue-600 dark:text-blue-500"></span>.
+        </h1>
+    </section>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Rozhodčími tohoto utkání <span id="be_verb"></span> <span id="honorifics"></span> <span class="list_rozhodcich text-blue-600 dark:text-blue-500"></span>
+    </h1>
+
+    <script src="assets/eventlog.js"></script>
+    <script>
+        addEventLog({
+            id: "intro",
+            time: "-5:00",
+            label: "Lineup a rozhodčí",
+            icon: "period-icon.png"
+        });
+
+        fetch("http://localhost:8080", {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                const utkani = res.utkani;
+                const indexDomaci = +(res.tymy[0].strana.toUpperCase() != "DOMÁCÍ");
+                const indexHosti = +!indexDomaci;
+
+                const formatter = new Intl.ListFormat('cs', { style: 'long', type: 'conjunction' });
+
+                document.querySelector(".list_rozhodcich").innerText = formatter.format(res.rozhodci);
+                document.getElementById("be_verb").innerText = res.rozhodci.length > 1 ? "jsou" : "je";
+                document.getElementById("honorifics").innerText = res.rozhodci.length > 1 ? "pánové" : "pan";
+
+                document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
+                document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);
+            })
+    </script>
+</body>
+
+</html>
