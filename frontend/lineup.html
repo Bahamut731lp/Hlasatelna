@@ -17,24 +17,31 @@
     <section class="py-8">
         <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
             Dámy a pánové, <br>
-            přivítejme na hřišti týmy <span class="domaci text-blue-600 dark:text-blue-500"></span> a <span class="hosti text-blue-600 dark:text-blue-500"></span>.
+            přivítejme na hřišti týmy <span class="domaci text-blue-600 dark:text-blue-500"></span> a <span
+                class="hosti text-blue-600 dark:text-blue-500"></span>.
         </h1>
     </section>
 
     <hr class="my-12">
 
     <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-        Rozhodčími tohoto utkání <span id="be_verb"></span> <span id="honorifics"></span> <span class="list_rozhodcich text-blue-600 dark:text-blue-500"></span>
+        Rozhodčími tohoto utkání <span id="be_verb"></span> <span id="honorifics"></span> <span
+            class="list_rozhodcich text-blue-600 dark:text-blue-500"></span>
     </h1>
 
     <script src="assets/eventlog.js"></script>
     <script>
-        addEventLog({
-            id: "intro",
-            time: "-5:00",
-            label: "Lineup a rozhodčí",
-            icon: "period-icon.png"
-        });
+
+        if (!sessionStorage.getItem("nastup")) {
+            addEventLog({
+                id: "intro",
+                time: "-5:00",
+                label: "Lineup a rozhodčí",
+                icon: "period-icon.png"
+            });
+
+            sessionStorage.setItem("nastup", true);
+        }
 
         fetch("http://localhost:8080", {
             mode: 'cors',
@@ -49,8 +56,10 @@
                 const indexHosti = +!indexDomaci;
 
                 const formatter = new Intl.ListFormat('cs', { style: 'long', type: 'conjunction' });
+                const rozhodci = res.rozhodci.map(roz => roz.split(/\s+/g).reverse().join(" "));
 
-                document.querySelector(".list_rozhodcich").innerText = formatter.format(res.rozhodci);
+
+                document.querySelector(".list_rozhodcich").innerText = formatter.format(rozhodci);
                 document.getElementById("be_verb").innerText = res.rozhodci.length > 1 ? "jsou" : "je";
                 document.getElementById("honorifics").innerText = res.rozhodci.length > 1 ? "pánové" : "pan";
 

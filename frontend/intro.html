@@ -28,7 +28,7 @@
     </section>
 
     <hr class="my-12">
-    <section class="grid grid-cols-2 gap-8">
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
             <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
                 Za tým <span class="hosti text-blue-600 dark:text-blue-500"></span> dnes nastoupí
@@ -58,12 +58,16 @@
     <script src="assets/eventlog.js"></script>
     <script>
 
-        addEventLog({
-            id: "intro",
-            time: "-10:00",
-            label: "Základní informace a sestavy družstev",
-            icon: "period-icon.png"
-        });
+        if (!sessionStorage.getItem("zahajeno")) {
+            addEventLog({
+                id: "intro",
+                time: "-10:00",
+                label: "Základní informace a sestavy družstev",
+                icon: "period-icon.png"
+            });
+
+            sessionStorage.setItem("zahajeno", true);
+        }
 
         fetch("http://localhost:8080", {
             mode: 'cors',
@@ -77,14 +81,30 @@
                 const indexDomaci = +(res.tymy[0].strana.toUpperCase() != "DOMÁCÍ");
                 const indexHosti = +!indexDomaci;
 
+                const sortByPost = (indexTymu) => Object.values(res.tymy[indexTymu].hraci).sort((a, b) => (Math.sign(b.post.indexOf("brank"))))
+                const renderPostIcon = (post) => {
+                    const brankarClassname = `bg-green-700 w-8 h-8 ml-auto flex justify-center`;
+                    const utocnikClassname = `bg-red-700 w-8 h-8 ml-auto flex justify-center`;
+                    const obranceClassname = `bg-blue-700 w-8 h-8 ml-auto flex justify-center`;
+
+                    switch (post) {
+                        case "brankář": return `<span class="${brankarClassname}">B</span>`;
+                        case "útočník": return `<span class="${utocnikClassname}">U</span>`;
+                        case "obránce": return `<span class="${obranceClassname}">O</span>`;
+
+                        default:
+                            break;
+                    }
+                }
+
                 document.getElementById("soutez").innerText = res.utkani
                 document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
                 document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);
 
-                document.getElementById("hosti_hraci").innerHTML = Object.values(res.tymy[indexHosti].hraci).map(hrac => `<li class="px-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span></li>`).join("\n")
+                document.getElementById("hosti_hraci").innerHTML = sortByPost(indexHosti).map(hrac => `<li class="grid grid-cols-3 pl-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span>${renderPostIcon(hrac.post)}</li>`).join("\n")
                 document.getElementById("hosti_realizace").innerHTML = Object.keys(res.tymy[indexHosti].realizacni).map((jmeno) => `<li class="px-2.5 even:bg-neutral-700">${res.tymy[indexHosti].realizacni[jmeno]} týmu je pan(í) <span class="tracking-wide uppercase">${jmeno}</span></li>`).join("\n")
-                
-                document.getElementById("domaci_hraci").innerHTML = Object.values(res.tymy[indexDomaci].hraci).map(hrac => `<li class="px-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span></li>`).join("\n")
+
+                document.getElementById("domaci_hraci").innerHTML = sortByPost(indexDomaci).map(hrac => `<li class="grid grid-cols-3 pl-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span>${renderPostIcon(hrac.post)}</li>`).join("\n")
                 document.getElementById("domaci_realizace").innerHTML = Object.keys(res.tymy[indexDomaci].realizacni).map((jmeno) => `<li class="px-2.5 even:bg-neutral-700">${res.tymy[indexDomaci].realizacni[jmeno]} týmu je pan(í) <span class="tracking-wide uppercase">${jmeno}</span></li>`).join("\n")
             })
 

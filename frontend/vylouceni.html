@@ -123,6 +123,26 @@
                 })
         }
 
+        addEventListener("beforeunload", () => {
+            const poleCas = document.getElementById("zprava_cas");
+            const poleHrac = document.getElementById("zprava_hrac");
+            const poleTym = document.getElementById("zprava_tym");
+            const poleDelkaTrestu = document.getElementById("zprava_delka_trestu");
+            const polePrestupek = document.getElementById("zprava_prestupek");
+
+            const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
+
+            if (!poleCas.textContent || !poleHrac.textContent) return;
+
+            events.push({
+                id: "vylouceni",
+                time: poleCas.textContent,
+                label: `Vyloučen hráč ${poleHrac.textContent} družstva ${poleTym.textContent} na ${poleDelkaTrestu.textContent} za ${polePrestupek.textContent.toLowerCase()}`,
+                icon: "penalty-icon.png"
+            });
+
+            sessionStorage.setItem("events", JSON.stringify(events));
+        });
 
         fetch("http://localhost:8080", {
             mode: 'cors',

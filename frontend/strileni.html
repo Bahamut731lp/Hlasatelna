@@ -16,28 +16,30 @@
 
     <section class="py-8">
 
-        <section class="grid grid-cols-3 gap-4 items-center">
+        <section class="grid grid-cols-4 gap-4 items-center">
 
             <label class="text-white text-sm font-medium">Střílí hráč družstva</label>
             <label class="text-white text-sm font-medium">Čas</label>
             <label class="text-white text-sm font-medium">Číslo hráče</label>
+            <label class="text-white text-sm font-medium">Výsledek střílení</label>
 
             <div class="flex flex-col">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                    <div
+                        class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
                         <input checked id="bordered-radio-1" type="radio" value="0" name="prestupek_tymu"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
                         <label for="bordered-radio-1"
                             class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
                     </div>
-                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                    <div
+                        class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
                         <input id="bordered-radio-2" type="radio" value="1" name="prestupek_tymu"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
                         <label for="bordered-radio-2"
                             class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
                     </div>
                 </div>
-
             </div>
 
             <div>
@@ -53,19 +55,67 @@
                         class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
                 </div>
             </div>
+
+            <div>
+                <ul class="grid gap-6 w-full md:grid-cols-2">
+                    <li class="group select-none cursor-pointer flex items-center">
+                        <input type="radio" id="promenil" name="promena" value="promenil" class="hidden peer"
+                            required>
+                        <label for="promenil"
+                            class="transition duration-50 group-hover:bg-green-500 group-hover:text-white cursor-pointer p-4 w-full text-sm font-medium text-white peer-checked:text-green-500 peer-checked:border-green-500 border border-gray-700 hover:border-green-500 rounded">
+                            Proměnil
+                        </label>
+                    </li>
+                    <li class="group select-none cursor-pointer flex items-center">
+                        <input type="radio" id="nepromenil" name="promena" value="nepromenil" class="hidden peer">
+                        <label for="nepromenil"
+                            class="transition duration-50 group-hover:bg-red-500 group-hover:text-white cursor-pointer p-4 w-full text-sm font-medium text-white peer-checked:text-red-500 peer-checked:border-red-500 border border-gray-700 hover:border-red-500 rounded">
+                            Neproměnil
+                        </label>
+                    </li>
+                </ul>
+            </div>
         </section>
     </section>
 
     <hr class="my-12">
 
     <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-        Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>. Trestné střílení za družstvo
-        <span id="zprava_tym" class="text-blue-600"></span> provede <span id="zprava_hrac"></span>.
+        Čas <span class="zprava_cas text-blue-600 dark:text-blue-500"></span>. Trestné střílení za družstvo
+        <span class="zprava_tym text-blue-600"></span> provede <span id="zprava_hrac"></span>.
     </h1>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Trestné střílení družstva <span class="zprava_tym text-blue-600"></span> <span class="zprava_hrac"></span> <span class="zprava_promenil"></span>.
+    </h1>
+
 
     <script src="assets/autoComplete.min.js"></script>
     <script>
-        
+
+        addEventListener("beforeunload", () => {
+            const poleCas = document.querySelector(".zprava_cas");
+            const poleHrac = document.querySelector(".zprava_hrac");
+            const poleTym = document.querySelector(".zprava_tym");
+            const polePromena = document.querySelector(".zprava_promenil");
+
+            const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
+            const promenil = !polePromena.textContent.includes("neproměnil");
+
+            if (!poleCas.textContent || !poleHrac.textContent) return;
+
+            events.push({
+                id: "strileni",
+                time: poleCas.textContent,
+                label: `Trestné střílení družstva ${poleTym.textContent} ${polePromena.textContent} ${poleHrac.textContent}`,
+                icon: promenil ? "shootouts-success-icon.png" : "shootouts-fail-icon.png"
+            });
+
+            sessionStorage.setItem("events", JSON.stringify(events));
+        });
+
         fetch("http://localhost:8080", {
             mode: 'cors',
             headers: {
@@ -80,28 +130,38 @@
 
                 let index = document.querySelector('input[name="prestupek_tymu"]:checked').value;
 
-                const poleCas = document.getElementById("zprava_cas");
-                const poleHrac = document.getElementById("zprava_hrac");
-                const poleTym = document.getElementById("zprava_tym");
+                const poleCas = document.querySelectorAll(".zprava_cas");
+                const poleHrac = document.querySelectorAll(".zprava_hrac");
+                const poleTym = document.querySelectorAll(".zprava_tym");
+                const polePromena = document.querySelectorAll(".zprava_promenil");
 
                 function vykresliHrace(cisloHrace) {
-
                     if (!(cisloHrace ?? false)) {
-                        poleHrac.innerHTML = " ? "
+                        poleHrac.forEach(p => p.innerHTML = " ? ")
                         return;
                     }
 
                     if (cisloHrace in tymy[index].hraci) {
                         let hrac = tymy[index].hraci[cisloHrace];
-                        poleHrac.innerHTML = `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`
+                        poleHrac.forEach(p => p.innerHTML = `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`);
                     }
                     else {
-                        poleHrac.innerHTML = `<span class="text-red-500">hráč číslo ${cisloHrace}</span>`;
+                        poleHrac.forEach(p => p.innerHTML = `<span class="text-red-500">hráč číslo ${cisloHrace}</span>`);
                     }
                 }
 
+                function vykresliPromenu(stav) {
+                    console.log(stav, stav == "promenil");
+
+                    const promenil = `<span class="text-green-500">proměnil</span>`;
+                    const nepromenil = `<span class="text-red-500">neproměnil</span>`
+
+                    if (stav == "promenil") polePromena.forEach(p => p.innerHTML = promenil);
+                    else polePromena.forEach(p => p.innerHTML = nepromenil);
+                }
+
                 function vykresliDrustvo(cisloDruzstva) {
-                    poleTym.innerText = tymy[cisloDruzstva].jmeno;
+                    poleTym.forEach(p => p.innerText = tymy[cisloDruzstva].jmeno);
                 }
 
                 function vykresliVsechno() {
@@ -109,17 +169,22 @@
                     vykresliDrustvo(index);
                 }
 
+
                 document.getElementById("hrac").addEventListener("input", (event) => vykresliHrace(event.target.value));
                 document.getElementById("cas_strileni").addEventListener("input", (event) => {
                     let chars = event.target.value.split("");
                     chars.splice(2, 0, ":");
 
-                    poleCas.innerText = chars.join("");
+                    poleCas.forEach(p => p.innerText = chars.join(""));
                 });
 
                 document.querySelectorAll(`input[name="prestupek_tymu"]`).forEach(input => input.addEventListener("input", (event) => {
                     index = Number(event.target.value);
                     vykresliVsechno();
+                }));
+
+                document.querySelectorAll(`input[name="promena"]`).forEach(input => input.addEventListener("input", (event) => {
+                    vykresliPromenu(event.target.value);
                 }));
 
                 document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);

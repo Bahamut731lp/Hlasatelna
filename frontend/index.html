@@ -10,25 +10,33 @@
 <body class="flex bg-neutral-900 min-h-screen">
     
     <main class="flex flex-1 flex-col gap-4 justify-center h-screen p-16">
-        <section class="flex gap-4">
-            <a href="intro.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
-                <h1 class="text-center">Intro + Sestavy</h1>
-            </a>
-            <a href="lineup.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
-                <h1 class="text-center">Lineup a Rozhodčí</h1>
-            </a>
+
+        <section class="space-y-2">
+            <h1 class="text-white text-4xl font-bold" id="tymy"></h1>
+            <h2 class="text-white text-2xl font-normal" id="utkani"></h2>
         </section>
 
-        <section class="flex gap-4">
-            <a href="branka.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
-                <h1 class="text-center">Branka</h1>
-            </a>
-            <a href="vylouceni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
-                <h1 class="text-center">Trest vyloučení</h1>
-            </a>
-            <a href="strileni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
-                <h1 class="text-center">Trestné střílení</h1>
-            </a>
+        <section class="flex flex-1 flex-col gap-4 justify-center">
+            <section class="flex gap-4">
+                <a href="intro.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Intro + Sestavy</h1>
+                </a>
+                <a href="lineup.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Lineup a Rozhodčí</h1>
+                </a>
+            </section>
+    
+            <section class="flex gap-4">
+                <a href="branka.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Branka</h1>
+                </a>
+                <a href="vylouceni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Trest vyloučení</h1>
+                </a>
+                <a href="strileni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Trestné střílení</h1>
+                </a>
+            </section>
         </section>
     </main>
 
@@ -42,10 +50,22 @@
     <script>
         const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
 
+        fetch("http://localhost:8080", {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+        .then(res => res.json())
+        .then(res => {
+            document.getElementById("tymy").innerText = `${res.tymy[0].jmeno} vs. ${res.tymy[1].jmeno}`;
+            document.getElementById("utkani").innerText = res.utkani;
+        });
+
         if (events.length > 0) {
             const HTML = events.map(event => (
                 `<li class="text-white flex items-center gap-4 py-4 px-2 even:bg-neutral-800">
-                    <span>${event.time}</span>
+                    <span class="w-1/12">${event.time}</span>
                     ${event.icon ? `<img class="w-4 h-4 object-contain" src="assets/icons/${event.icon}">` : ""}
                     <p class="font-bold">${event.label}<p>
                 </li>`

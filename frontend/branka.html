@@ -25,13 +25,19 @@
 
             <div class="flex flex-col">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
-                        <input checked id="bordered-radio-1" type="radio" value="0" name="branka_tymu" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
-                        <label for="bordered-radio-1" class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                    <div
+                        class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                        <input checked id="bordered-radio-1" type="radio" value="0" name="branka_tymu"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
+                        <label for="bordered-radio-1"
+                            class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
                     </div>
-                    <div class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
-                        <input id="bordered-radio-2" type="radio" value="1" name="branka_tymu" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
-                        <label for="bordered-radio-2" class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                    <div
+                        class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
+                        <input id="bordered-radio-2" type="radio" value="1" name="branka_tymu"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
+                        <label for="bordered-radio-2"
+                            class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
                     </div>
                 </div>
 
@@ -63,11 +69,33 @@
     <hr class="my-12">
 
     <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-        Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>, branku družstva <span id="zprava_tym" class="text-blue-600 dark:text-blue-500"></span> vstřelil <span id="zprava_golman"></span> <span id="zprava_asistence"></span>
-    </h1> 
+        Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>, branku družstva <span
+            id="zprava_tym" class="text-blue-600 dark:text-blue-500"></span> vstřelil <span id="zprava_golman"></span>
+        <span id="zprava_asistence"></span>
+    </h1>
 
     <script>
-    
+
+        addEventListener("beforeunload", () => {
+            const poleGolman = document.getElementById("zprava_golman");
+            const poleAsistence = document.getElementById("zprava_asistence");
+            const poleCas = document.getElementById("zprava_cas");
+            const poleDruzstvo = document.getElementById("zprava_tym");
+
+            const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
+
+            if (!poleCas.textContent || !poleGolman.textContent) return;
+            
+            events.push({
+                id: "branka",
+                time: poleCas.textContent,
+                label: `Branku týmu ${poleDruzstvo.textContent} vstřelil ${poleGolman.textContent} ${poleAsistence.textContent}`,
+                icon: "goal-icon.png"
+            });
+
+            sessionStorage.setItem("events", JSON.stringify(events));
+        });
+
         fetch("http://localhost:8080", {
             mode: 'cors',
             headers: {
