@@ -1,1 +1,1 @@
-start chrome "$(pwd)/frontend/index.html" & deno run --allow-all hlasatelna.ts $1
+start chrome "http://localhost" & deno run --allow-all hlasatelna.ts $1

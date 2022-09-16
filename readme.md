@@ -60,7 +60,7 @@ Backend by se vám měl na standardní výstup ohlásit s tím, o jaký zápas j
 
 Pokud jste **hlasatelnu** spouštěli pomocí `*.sh` skriptů, byl vám automaticky spuštěn i Google Chrome (pokud ho teda máte) s úvodní stránkou, která slouží jako navigace.
 
-Pokud jste **hlasatelnu** spouštěli jinak, otevřete soubor `index.html` ve svém prohlížeči (preferovaně Chrome, Firefox či jejich up-to-date deriváty).
+Pokud jste **hlasatelnu** spouštěli jinak, otevřete webový prohlížeč a zadejte adresu `http://localhost` (preferovaně v Chrome, Firefox či jejich up-to-date deriváty).
 
 ## Použití
 Po spuštění backendu a rozhraní **hlasatelny** je její použití přímočaré. Na hlavní stránce jsou dvě sady obřích tlačítek.

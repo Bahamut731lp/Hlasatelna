@@ -1,1 +1,1 @@
-deno compile --allow-net --allow-read=. hlasatelna.ts
+deno compile --allow-net --allow-read hlasatelna.ts

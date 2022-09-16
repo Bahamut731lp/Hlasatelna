@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hlasatelna</title>
-    <link rel="stylesheet" href="dist/output.css">
+    <link rel="stylesheet" href="output.css">
 </head>
 <body class="flex bg-neutral-900 min-h-screen">
     
@@ -18,22 +18,22 @@
 
         <section class="flex flex-1 flex-col gap-4 justify-center">
             <section class="flex gap-4">
-                <a href="intro.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="intro" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Intro + Sestavy</h1>
                 </a>
-                <a href="lineup.html" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="lineup" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Lineup a Rozhodčí</h1>
                 </a>
             </section>
     
             <section class="flex gap-4">
-                <a href="branka.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="branka" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Branka</h1>
                 </a>
-                <a href="vylouceni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="vylouceni" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Trest vyloučení</h1>
                 </a>
-                <a href="strileni.html" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="strileni" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Trestné střílení</h1>
                 </a>
             </section>
@@ -66,7 +66,7 @@
             const HTML = events.map(event => (
                 `<li class="text-white flex items-center gap-4 py-4 px-2 even:bg-neutral-800">
                     <span class="w-1/12">${event.time}</span>
-                    ${event.icon ? `<img class="w-4 h-4 object-contain" src="assets/icons/${event.icon}">` : ""}
+                    ${event.icon ? `<img class="w-4 h-4 object-contain" src="icons/${event.icon}">` : ""}
                     <p class="font-bold">${event.label}<p>
                 </li>`
             )).join("\n");

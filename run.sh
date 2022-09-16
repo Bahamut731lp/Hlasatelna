@@ -1,1 +1,1 @@
-start chrome "$(pwd)/frontend/index.html" & hlasatelna $1
+start chrome "http://localhost" & hlasatelna $1
