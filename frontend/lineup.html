@@ -43,7 +43,7 @@
             sessionStorage.setItem("nastup", true);
         }
 
-        fetch("http://localhost:8080", {
+        fetch(`${window.location.origin}:8080`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*'
