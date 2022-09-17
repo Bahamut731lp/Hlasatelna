@@ -24,15 +24,24 @@
 
     <hr class="my-12">
 
+    <div>
+        <input type="text" name="" id="lineup_domaci" />
+
+        <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            Za tým <span class="domaci text-blue-600 dark:text-blue-500"></span> dnes nastoupí
+        </h1>
+        <ul id="domaci_hraci" class="text-2xl border border-neutral-600"></ul>
+    </div>
+
     <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
         Rozhodčími tohoto utkání <span id="be_verb"></span> <span id="honorifics"></span> <span
             class="list_rozhodcich text-blue-600 dark:text-blue-500"></span>
     </h1>
 
-    <script src="eventlog.js"></script>
     <script>
+        //<script src="assets/eventlog.js">
 
-        if (!sessionStorage.getItem("nastup")) {
+        /*if (!sessionStorage.getItem("nastup")) {
             addEventLog({
                 id: "intro",
                 time: "-5:00",
@@ -41,7 +50,7 @@
             });
 
             sessionStorage.setItem("nastup", true);
-        }
+        }*/
 
         fetch(`${window.location.origin}:8080`, {
             mode: 'cors',
@@ -58,10 +67,39 @@
                 const formatter = new Intl.ListFormat('cs', { style: 'long', type: 'conjunction' });
                 const rozhodci = res.rozhodci.map(roz => roz.split(/\s+/g).reverse().join(" "));
 
+                const LIST_DOMACI = document.getElementById("domaci_hraci");
+
+                const renderPostIcon = (post) => {
+                    const brankarClassname = `bg-green-700 w-8 h-8 ml-auto flex justify-center`;
+                    const utocnikClassname = `bg-red-700 w-8 h-8 ml-auto flex justify-center`;
+                    const obranceClassname = `bg-blue-700 w-8 h-8 ml-auto flex justify-center`;
+
+                    switch (post) {
+                        case "brankář": return `<span class="${brankarClassname}">B</span>`;
+                        case "útočník": return `<span class="${utocnikClassname}">U</span>`;
+                        case "obránce": return `<span class="${obranceClassname}">O</span>`;
+
+                        default:
+                            break;
+                    }
+                }
 
                 document.querySelector(".list_rozhodcich").innerText = formatter.format(rozhodci);
                 document.getElementById("be_verb").innerText = res.rozhodci.length > 1 ? "jsou" : "je";
                 document.getElementById("honorifics").innerText = res.rozhodci.length > 1 ? "pánové" : "pan";
+                document.getElementById("lineup_domaci").addEventListener("input", (event) => {
+                    console.log(event.target.value);
+                    let list = event.target.value.split(/,|\s+/gim);
+
+                    LIST_DOMACI.innerHTML = list.map((hrac_id) => {
+                        let cisloHrace = parseInt(hrac_id);
+                        let hrac = res.tymy[indexDomaci].hraci[cisloHrace];
+
+                        if (!hrac) return "";
+
+                        return `<li class="grid grid-cols-3 pl-2.5 even:bg-neutral-700">s číslem ${hrac.cislo}, <span class="tracking-wide uppercase">${hrac.jmeno}</span>${renderPostIcon(hrac.post)}</li>`;
+                    });
+                });
 
                 document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
                 document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);

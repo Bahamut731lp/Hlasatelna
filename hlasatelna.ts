@@ -186,11 +186,11 @@ async function main(id: string | number) {
         })
         .get("/vylouceni", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = strely;
+            ctx.response.body = vylouceni;
         })
         .get("/strileni", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = vylouceni;
+            ctx.response.body = strely;
         });
 
     frontend.use(router.routes());

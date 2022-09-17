@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="assets/output.css">
+    <link rel="stylesheet" href="output.css">
 </head>
 
 <body class="bg-neutral-900 text-white p-16">
@@ -58,7 +58,7 @@
     <script src="eventlog.js"></script>
     <script>
 
-        if (!sessionStorage.getItem("zahajeno")) {
+        /*if (!sessionStorage.getItem("zahajeno")) {
             addEventLog({
                 id: "intro",
                 time: "-10:00",
@@ -67,7 +67,7 @@
             });
 
             sessionStorage.setItem("zahajeno", true);
-        }
+        }*/
 
         fetch(`${window.location.origin}:8080`, {
             mode: 'cors',
