@@ -72,7 +72,7 @@
         Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>, branku družstva <span
             id="zprava_tym" class="text-blue-600 dark:text-blue-500"></span> vstřelil <span id="zprava_golman"></span>
         <span id="zprava_asistence"></span>. 
-        <br>Stav utkání <span class="text-blue-600 domaci"></span> proti <span class="text-blue-600 hosti"></span>: ...
+        <br>Stav utkání <span class="text-blue-600 domaci"></span> proti <span class="text-blue-600 hosti"></span>: <span class="stav"></span>
     </h1>
 
     <script>
@@ -82,13 +82,14 @@
             const poleAsistence = document.getElementById("zprava_asistence");
             const poleCas = document.getElementById("zprava_cas");
             const poleDruzstvo = document.getElementById("zprava_tym");
-
+            const tym = document.querySelector('input[name="branka_tymu"]:checked').value;
             const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
 
             if (!poleCas.textContent || !poleGolman.textContent) return;
             
             events.push({
                 id: "branka",
+                tym,
                 time: poleCas.textContent,
                 label: `Branku týmu ${poleDruzstvo.textContent} vstřelil ${poleGolman.textContent} ${poleAsistence.textContent}`,
                 icon: "goal-icon.png"
@@ -153,6 +154,13 @@
                     vykresliGolman(document.getElementById("golman").value);
                     vykresliAsistenci(document.getElementById("asistent").value);
                     vykresliDrustvo(index);
+
+                    const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
+                    const goly = events.filter(event => event.id == "branka");
+                    const golyDomaci = goly.filter(event => event.tym == 0).length;
+                    const golyHosti = goly.length - golyDomaci;
+
+                    document.querySelectorAll(".stav").forEach(txt => txt.innerHTML = `${golyDomaci + !Number(index)}:${golyHosti + Number(index)}`);
                 }
 
                 document.querySelectorAll(`input[name="branka_tymu"]`).forEach(input => input.addEventListener("input", (event) => {
