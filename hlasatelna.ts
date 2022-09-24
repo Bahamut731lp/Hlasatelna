@@ -7,7 +7,7 @@ import {
 import { Application, Router } from "https://deno.land/x/oak@v11.1.0/mod.ts";
 import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-import { brightMagenta, green, brightBlue, underline, yellow } from "https://deno.land/std/fmt/colors.ts";
+import { brightMagenta, brightRed, green, brightBlue, underline, yellow } from "https://deno.land/std/fmt/colors.ts";
 
 interface Hrac {
     cislo: string;
@@ -213,8 +213,14 @@ async function main(id: string | number) {
     });
 
     console.log(`Načten zápas ${brightMagenta(String(id))}: ${green(data.utkani)}`);
-    console.log(`(${brightBlue(data.tymy[0].jmeno)} vs. ${brightBlue(data.tymy[1].jmeno)} )`);
+    console.log(`(${brightBlue(data.tymy[0].jmeno)} vs. ${brightBlue(data.tymy[1].jmeno)})`);
     console.log();
+
+    
+    if (!data.rozhodci) console.log(brightRed("Nebyly nalezeni rozhodčí"));
+    if (data.tymy.length != 2) console.log(brightRed("Nebyly nalezeni přesně dva týmy. Wtf."));
+    if (!Object.values(data.tymy[0].hraci).length) console.log(brightRed(`Nebyly nalezeni hráči týmu ${data.tymy[0].jmeno}`));
+    if (!Object.values(data.tymy[1].hraci).length) console.log(brightRed(`Nebyly nalezeni hráči týmu ${data.tymy[1].jmeno}`));
 
     app.listen({ port });
     frontend.listen({ port: 80 });
@@ -226,7 +232,7 @@ async function main(id: string | number) {
 await new Command()
     .name("hlasatelna")
     .version("1.0.0")
-    .description("Backend pro sběr dat z florbalových utkání")
+    .description("Pomocný nástroj pro hlasatele florbalových utkání")
     .arguments("<kod_utkani:string>")
     .action((_, id) => main(id))
     .parse(Deno.args);
