@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,8 +8,9 @@
     <title>Hlasatelna</title>
     <link rel="stylesheet" href="output.css">
 </head>
+
 <body class="flex flex-col xl:flex-row bg-neutral-900 min-h-screen">
-    
+
     <main class="flex flex-1 flex-col gap-4 justify-center h-screen p-16">
 
         <section class="space-y-2">
@@ -18,30 +20,60 @@
 
         <section class="flex flex-1 flex-col gap-4 justify-center">
             <section class="flex gap-4">
-                <a href="intro" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="intro" class="w-48 h-48 bg-red-700 text-white text-2xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Intro + Sestavy</h1>
+                    <code class="font-monospace text-sm">1 - 1</code>
                 </a>
-                <a href="lineup" class="w-64 h-64 bg-red-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="lineup"
+                    class="w-48 h-48 bg-red-700 text-white text-2xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Lineup a Rozhodčí</h1>
+                    <code class="font-monospace text-sm">1 - 2</code>
                 </a>
             </section>
-    
+
             <section class="flex gap-4">
-                <a href="branka" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="branka"
+                    class="w-48 h-48 bg-blue-700 text-white text-2xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Branka</h1>
+                    <code class="font-monospace text-sm">2 - 1</code>
                 </a>
-                <a href="vylouceni" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="vylouceni"
+                    class="w-48 h-48 bg-blue-700 text-white text-2xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Trest vyloučení</h1>
+                    <code class="font-monospace text-sm">2 - 2</code>
                 </a>
-                <a href="strileni" class="w-64 h-64 bg-blue-700 text-white text-4xl cursor-pointer grid place-items-center">
+                <a href="strileni"
+                    class="w-48 h-48 bg-blue-700 text-white text-2xl cursor-pointer grid place-items-center">
                     <h1 class="text-center">Trestné střílení</h1>
+                    <code class="font-monospace text-sm">2 - 3</code>
                 </a>
+            </section>
+
+            <section class="flex gap-4">
+                <a href="nejlepsi-hraci"
+                    class="w-48 h-48 bg-violet-700 text-white text-2xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Nejlepší hráči</h1>
+                    <code class="font-monospace text-sm">3 - 1</code>
+                </a>
+                <a href="prodlouzeni"
+                    class="w-48 h-48 bg-violet-700 text-white text-2xl cursor-pointer grid place-items-center">
+                    <h1 class="text-center">Prodloužení</h1>
+                    <code class="font-monospace text-sm">3 - 2</code>
+                </a>
+                <span class="cursor-not-allowed">
+                    <a href="najezdy"
+                        class="w-48 h-48 bg-violet-700 text-white text-2xl cursor-pointer grid place-items-center pointer-events-none opacity-30">
+                        <h1 class="text-center">Nájezdy</h1>
+                        <code class="font-monospace text-sm">3 - 3</code>
+                    </a>
+                </span>
             </section>
         </section>
     </main>
 
     <aside class="hidden xl:block px-16 w-1/3 max-h-screen overflow-y-hidden">
-        <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Event Log</h1>
+        <h1 class="mb-4 leading-relaxed text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Event Log
+        </h1>
         <ul id="event_log" class="overflow-y-scroll h-5/6 border border-gray-200">
 
         </ul>
@@ -50,17 +82,51 @@
     <script>
         const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
 
+        const keybinds = {
+            1: {
+                1: "intro",
+                2: "lineup"
+            },
+            2: {
+                1: "branka",
+                2: "vylouceni",
+                3: "strileni"
+            },
+            3: {
+                1: "nejlepsi-hraci",
+                2: "prodlouzeni",
+                //3: "najezdy"
+            }
+        }
+
+        const klice = Object.keys(keybinds);
+
+        let pressed = null;
+
+        document.addEventListener("keypress", (event) => {
+            if (pressed != null) {
+                if (Object.keys(keybinds[pressed]).includes(event.key)) {
+                    window.location.pathname = keybinds[pressed][event.key];
+                }
+
+                pressed = null;
+                return;
+            }
+
+            if (klice.includes(event.key)) pressed = event.key;
+        });
+
         fetch(`${window.location.origin}:8080`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*'
             }
         })
-        .then(res => res.json())
-        .then(res => {
-            document.getElementById("tymy").innerText = `${res.tymy[0].jmeno} vs. ${res.tymy[1].jmeno}`;
-            document.getElementById("utkani").innerText = res.utkani;
-        });
+            .then(res => res.json())
+            .then(res => {
+                document.getElementById("tymy").innerText = `${res.tymy[0].jmeno} vs. ${res.tymy[1].jmeno}`;
+                document.getElementById("utkani").innerText = res.utkani;
+            });
 
         if (events.length > 0) {
             const HTML = events.map(event => (
@@ -73,8 +139,9 @@
 
             document.getElementById("event_log").innerHTML = HTML;
         }
-        
+
     </script>
 
 </body>
+
 </html>

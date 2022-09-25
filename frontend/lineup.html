@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Hlasatelna - Lineup</title>
     <link rel="stylesheet" href="output.css">
 </head>
 
@@ -21,13 +21,6 @@
                 class="hosti text-blue-600 dark:text-blue-500"></span>.
         </h1>
     </section>
-
-    <hr class="my-12">
-
-    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-        Rozhodčími tohoto utkání <span id="be_verb"></span> <span id="honorifics"></span> <span
-            class="list_rozhodcich text-blue-600 dark:text-blue-500"></span>
-    </h1>
 
     <hr class="my-12">
     
@@ -50,6 +43,13 @@
 
         <ul id="hosti_hraci" class="text-2xl border border-neutral-600"></ul>
     </div>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Rozhodčími tohoto utkání <span id="be_verb"></span> <span id="honorifics"></span> <span
+            class="list_rozhodcich text-blue-600 dark:text-blue-500"></span>
+    </h1>
 
     <script>
         //<script src="assets/eventlog.js">
@@ -106,11 +106,16 @@
                 document.getElementById("honorifics").innerText = res.rozhodci.length > 1 ? "pánové" : "pan";
                 document.getElementById("lineup_domaci").addEventListener("input", (event) => {
                     sessionStorage.setItem("lineup_domaci", event.target.value);
+                    const hraci = res.tymy[indexDomaci].hraci;
+
                     let list = event.target.value.split(/,|\s+/gim);
+                    let brankari = list.filter((id) => hraci[id]?.post == "brankář");
+                    
+                    list = [...new Set([...brankari, ...list])];
 
                     LIST_DOMACI.innerHTML = list.map((hrac_id) => {
                         let cisloHrace = parseInt(hrac_id);
-                        let hrac = res.tymy[indexDomaci].hraci[cisloHrace];
+                        let hrac = hraci[cisloHrace];
 
                         if (!hrac) return "";
 
@@ -120,11 +125,16 @@
 
                 document.getElementById("lineup_hosti").addEventListener("input", (event) => {
                     sessionStorage.setItem("lineup_hosti", event.target.value);
+                    const hraci = res.tymy[indexHosti].hraci;
+
                     let list = event.target.value.split(/,|\s+/gim);
+                    let brankari = list.filter((id) => hraci[id]?.post == "brankář");
+                    
+                    list = [...new Set([...brankari, ...list])];
 
                     LIST_HOSTI.innerHTML = list.map((hrac_id) => {
                         let cisloHrace = parseInt(hrac_id);
-                        let hrac = res.tymy[indexDomaci].hraci[cisloHrace];
+                        let hrac = hraci[cisloHrace];
 
                         if (!hrac) return "";
 

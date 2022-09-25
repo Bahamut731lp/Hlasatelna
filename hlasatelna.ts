@@ -155,6 +155,7 @@ async function main(id: string | number) {
     const data: Metadata = await getMatchMetadata(id);
     const configuration = config();
     const port = parseInt(configuration.PORT);
+    const debug = Boolean(configuration.DEBUG);
 
     const app = new Application();
     const frontend = new Application();
@@ -164,33 +165,43 @@ async function main(id: string | number) {
     const intro = await Deno.readTextFileSync('./frontend/intro.html');
     const lineup = await Deno.readTextFileSync('./frontend/lineup.html');
     const branky = await Deno.readTextFileSync('./frontend/branka.html');
-    const strely = await Deno.readTextFileSync('./frontend/strileni.html');
+    const strileni = await Deno.readTextFileSync('./frontend/strileni.html');
     const vylouceni = await Deno.readTextFileSync('./frontend/vylouceni.html');
+    const nejlepsiHraci = await Deno.readTextFileSync('./frontend/nejlepsi-hraci.html');
+    const prodlouzeni = await Deno.readTextFileSync('./frontend/prodlouzeni.html');
 
     router
         .get("/", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = index;
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/index.html') : index;
         })
         .get("/intro", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = intro;
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/intro.html') : intro;
         })
         .get("/lineup", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = lineup;
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/lineup.html') : lineup;
         })
         .get("/branka", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = branky;
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/branka.html') : branky;
         })
         .get("/vylouceni", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = vylouceni;
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/vylouceni.html') : vylouceni;
         })
         .get("/strileni", (ctx) => {
             ctx.response.headers.set("Content-Type", "text/html")
-            ctx.response.body = strely;
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/strileni.html') : strileni;
+        })
+        .get("/nejlepsi-hraci", (ctx) => {
+            ctx.response.headers.set("Content-Type", "text/html")
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/nejlepsi-hraci.html') : nejlepsiHraci;
+        })
+        .get("/prodlouzeni", (ctx) => {
+            ctx.response.headers.set("Content-Type", "text/html")
+            ctx.response.body = debug ? Deno.readTextFileSync('./frontend/prodlouzeni.html') : nejlepsiHraci;
         });
 
     frontend.use(router.routes());

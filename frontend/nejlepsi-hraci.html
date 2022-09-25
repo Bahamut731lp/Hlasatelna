@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hlasatelna - Nejlepší hráči</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+
+<body class="bg-neutral-900 text-white p-16">
+    <a href="/"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Zpátky</a>
+
+    <section class="py-8">
+
+        <section class="grid grid-cols-2 gap-4 items-center">
+
+            <label class="text-white text-sm font-medium">Nejlepší hráč <span class="hosti"></span></label>
+            <label class="text-white text-sm font-medium">Nejlepší hráč <span class="domaci"></span></label>
+
+            <div>
+                <div class="mt-1">
+                    <input id="nejlepsi_hosti" name="email" type="number" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <div class="mt-1">
+                    <input id="nejlepsi_domaci" name="email" type="number" required="" autocomplete="off"
+                        class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Dámy a pánove, nyní si pojďme vyhlásit nejlepší hráče utkání.
+    </h1>
+
+    <hr class="my-12">
+    
+    <h1 id="zprava" class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+
+    </h1>
+
+    <hr class="my-12">
+
+    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        Děkujeme hráčům za jejich výkony a vám divákům za sledování. Těšíme se na vás příště, nashledanou.
+    </h1>
+
+    <script src="master.js"></script>
+</body>
+
+<script>
+
+    function getPlayerFromTeam(team, player) {
+        const data = getData();
+        const hrac = data.tymy[team].hraci[player];
+
+        if (!hrac) {
+            return `<span class="text-red-500">hráč číslo ${player}</span>`;
+        };
+        
+        return `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`;
+    }
+
+    const processors = {
+        "pole:nejlepsi_domaci": (player) => getPlayerFromTeam(0, player),
+        "pole:nejlepsi_hosti": (player) => getPlayerFromTeam(1, player)
+    }
+
+    getReactContent("Nejlepším hráčem družstva data:hosti je pole:nejlepsi_hosti,</br> a nejlepším hráčem družstva data:domaci je pole:nejlepsi_domaci", processors, document.getElementById("zprava"));
+
+</script>
+
+</html>
+
+V základní hrací době nebylo rozhodnuto o výsledku utkání, po pauze bude následovat 5 minutové prodloužení
+Hraje se poslední minuta prodloužení.
