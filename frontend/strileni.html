@@ -110,6 +110,8 @@
                 id: "strileni",
                 time: poleCas.textContent,
                 label: `Trestné střílení družstva ${poleTym.textContent} ${polePromena.textContent} ${poleHrac.textContent}`,
+                promenil,
+                tym: document.querySelector('input[name="prestupek_tymu"]:checked').value,
                 icon: promenil ? "shootouts-success-icon.png" : "shootouts-fail-icon.png"
             });
 

@@ -72,7 +72,7 @@
         Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>, branku družstva <span
             id="zprava_tym" class="text-blue-600 dark:text-blue-500"></span> vstřelil <span id="zprava_golman"></span>
         <span id="zprava_asistence"></span>. 
-        <br>Stav utkání <span class="text-blue-600 domaci"></span> proti <span class="text-blue-600 hosti"></span>: <span class="stav"></span>
+        <br>Stav utkání <span class="text-blue-600 domaci"></span> <span class="text-blue-600 hosti"></span>: <span class="stav"></span>
     </h1>
 
     <script>
@@ -156,7 +156,7 @@
                     vykresliDrustvo(index);
 
                     const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
-                    const goly = events.filter(event => event.id == "branka");
+                    const goly = events.filter(event => event.id == "branka" || Boolean(event?.promenil));
                     const golyDomaci = goly.filter(event => event.tym == 0).length;
                     const golyHosti = goly.length - golyDomaci;
 

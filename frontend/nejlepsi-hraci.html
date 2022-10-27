@@ -17,8 +17,8 @@
 
         <section class="grid grid-cols-2 gap-4 items-center">
 
-            <label class="text-white text-sm font-medium">Nejlepší hráč <span class="hosti"></span></label>
-            <label class="text-white text-sm font-medium">Nejlepší hráč <span class="domaci"></span></label>
+            <label id="label_hosti" class="text-white text-sm font-medium"></label>
+            <label id="label_domaci" class="text-white text-sm font-medium"></label>
 
             <div>
                 <div class="mt-1">
@@ -75,11 +75,11 @@
         "pole:nejlepsi_hosti": (player) => getPlayerFromTeam(1, player)
     }
 
+    getReactContent("Nejlepší hráč družstva data:hosti", {}, document.getElementById("label_hosti"));
+    getReactContent("Nejlepší hráč družstva data:domaci", {}, document.getElementById("label_domaci"));
+
     getReactContent("Nejlepším hráčem družstva data:hosti je pole:nejlepsi_hosti,</br> a nejlepším hráčem družstva data:domaci je pole:nejlepsi_domaci", processors, document.getElementById("zprava"));
 
 </script>
 
 </html>
-
-V základní hrací době nebylo rozhodnuto o výsledku utkání, po pauze bude následovat 5 minutové prodloužení
-Hraje se poslední minuta prodloužení.
