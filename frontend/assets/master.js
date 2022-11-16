@@ -30,7 +30,10 @@ const getReactContent = (pattern, processors, target) => getData((data => {
         const id = pole.replace("pole:", "");
         const input = document.getElementById(id);
 
-        if (!input) return console.warn(`Input pole ${id} nebylo nalezeno. Přeskakuje se.`);
+        if (!input) {
+            console.warn(`Input pole ${id} nebylo nalezeno. Přeskakuje se.`);
+            continue;
+        }
         
         input.addEventListener("input", (event) => {
             const fields = document.getElementsByClassName(id);
@@ -38,12 +41,13 @@ const getReactContent = (pattern, processors, target) => getData((data => {
                 field.innerHTML = processors?.[pole]?.(event.target.value) ?? event.target.value;
             }
         });
-
-        message = message.replaceAll(pole, `<span class="${id}">...</span>`);
+        
+        message = message.replaceAll(pole, `<span class="${id}">${processors?.[pole]?.(null) ?? "..."}</span>`);
+        input.dispatchEvent(new Event("input"));
     }
 
     for (const info of reactData) {
-        message = message.replaceAll(info, `<span class="text-blue-600">${databinds[info]}</span>`);
+        message = message.replaceAll(info, `<span>${databinds[info]}</span>`);
     }
 
     target.innerHTML = message;

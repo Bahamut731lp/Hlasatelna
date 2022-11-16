@@ -105,7 +105,7 @@ async function getTeamSupports(id: string | number) {
 
         tabulka.querySelectorAll("td").forEach((val: any) => {
             const hodnoty = val.textContent.split("-");
-            const jmeno = hodnoty?.shift()?.trim() ?? "Neznámé";
+            const jmeno = (hodnoty?.shift() ?? "Neznámé").replace(/\(.+\)/, "").trim();
 
             lidi[jmeno] = (lidi[jmeno] ?? "") + (lidi[jmeno] ? ", " : "") +
                 (hodnoty.pop()?.trim() ?? "Neznámé" + lidi[jmeno]);
@@ -145,7 +145,7 @@ async function getMatchMetadata(id: string | number): Promise<Metadata> {
         }
     ));
 
-    rozhodci = rozhodci.split(",").map((v) => v.trim());
+    rozhodci = rozhodci.split(",").map((v) => v.trim().split(/\s+/g).reverse().join(" "));
     utkani = utkani.split(";")?.slice(1)?.join(" - ")?.trim();
 
     return { rozhodci, utkani, tymy };

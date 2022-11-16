@@ -30,14 +30,16 @@
                         <input checked id="bordered-radio-1" type="radio" value="0" name="branka_tymu"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
                         <label for="bordered-radio-1"
-                            class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                            class="domaci cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"
+                            id="domaci"></label>
                     </div>
                     <div
                         class="select-none cursor-pointer transition duration-50 hover:border-blue-500 flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
                         <input id="bordered-radio-2" type="radio" value="1" name="branka_tymu"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300">
                         <label for="bordered-radio-2"
-                            class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                            class="hosti cursor-pointer py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"
+                            id="hosti"></label>
                     </div>
                 </div>
 
@@ -45,7 +47,7 @@
 
             <div>
                 <div class="mt-1">
-                    <input id="cas_branky" type="number" required="" autocomplete="off"
+                    <input id="cas" type="number" required="" autocomplete="off"
                         class="block w-full px-5 py-3 text-base transition duration-500 ease-in-out transform border border-transparent text-neutral-600 bg-gray-50 focus:outline-none">
                 </div>
             </div>
@@ -67,14 +69,17 @@
     </section>
 
     <hr class="my-12">
+    <input type="hidden" id="druzstvo" value="0">
 
-    <h1 class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+    <h1 id="zprava" class="mb-4 leading-relaxed text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
         Čas <span id="zprava_cas" class="text-blue-600 dark:text-blue-500"></span>, branku družstva <span
             id="zprava_tym" class="text-blue-600 dark:text-blue-500"></span> vstřelil <span id="zprava_golman"></span>
-        <span id="zprava_asistence"></span>. 
-        <br>Stav utkání <span class="text-blue-600 domaci"></span> <span class="text-blue-600 hosti"></span>: <span class="stav"></span>
+        <span id="zprava_asistence"></span>.
+        <br>Stav utkání <span class="text-blue-600 domaci"></span> <span class="text-blue-600 hosti"></span>: <span
+            class="stav"></span>
     </h1>
 
+    <script src="/master.js"></script>
     <script>
 
         addEventListener("beforeunload", () => {
@@ -86,7 +91,7 @@
             const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
 
             if (!poleCas.textContent || !poleGolman.textContent) return;
-            
+
             events.push({
                 id: "branka",
                 tym,
@@ -98,96 +103,57 @@
             sessionStorage.setItem("events", JSON.stringify(events));
         });
 
-        fetch(`${window.location.origin}:8080`, {
-            mode: 'cors',
-            headers: {
-                'Access-Control-Allow-Origin': '*'
-            }
-        })
-            .then(res => res.json())
-            .then(res => {
-                const tymy = res.tymy;
-                const indexDomaci = +(res.tymy[0].strana.toUpperCase() != "DOMÁCÍ");
-                const indexHosti = +!indexDomaci;
-                const poleGolman = document.getElementById("zprava_golman");
-                const poleAsistence = document.getElementById("zprava_asistence");
-                const poleCas = document.getElementById("zprava_cas");
-                const poleDruzstvo = document.getElementById("zprava_tym");
+        function getPlayerFromTeam(player) {
+            let team = document.querySelector('input[name="branka_tymu"]:checked').value;
+            if (player == null) return "________";
 
-                let index = document.querySelector('input[name="branka_tymu"]:checked').value;
+            const data = getData();
+            const hrac = data.tymy[team].hraci[player];
 
-                function vykresliGolman(cisloHrace) {
-                    if (!(cisloHrace ?? false)) {
-                        poleGolman.innerHTML = " ? "
-                        return;
-                    }
+            if (!hrac) {
+                return `<span class="text-red-500">hráč číslo ${player}</span>`;
+            };
 
-                    if (cisloHrace in tymy[index].hraci) {
-                        let hrac = tymy[index].hraci[cisloHrace];
-                        poleGolman.innerHTML = `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`
-                    }
-                    else {
-                        poleGolman.innerHTML = `<span class="text-red-500">hráč číslo ${cisloHrace}</span>`;
-                    }
-                }
+            return `<span class="text-green-500">hráč číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`;
+        }
 
-                function vykresliAsistenci(cisloHrace) {
-                    if (!(cisloHrace ?? false)) {
-                        poleAsistence.innerHTML = "bez asistence."
-                        return;
-                    }
+        function getFormattedTime(cas) {
+            if (!cas) return "________";
 
-                    if (cisloHrace in tymy[index].hraci) {
-                        let hrac = tymy[index].hraci[cisloHrace];
-                        poleAsistence.innerHTML = `za asistence <span class="text-green-500">hráče číslo ${hrac.cislo}, ${hrac.jmeno.split(/\s+/gim).reverse().join(" ")}</span>`
-                    }
-                    else {
-                        poleAsistence.innerHTML = `za asistence <span class="text-red-500">hráče číslo ${cisloHrace}</span>`;
-                    }
-                }
+            let time = [
+                cas.slice(0, Math.floor(cas.length / 2)),
+                ":",
+                ...cas.split("").slice(Math.floor(cas.length / 2))
+            ].join("");
 
-                function vykresliDrustvo(cisloDruzstva) {
-                    poleDruzstvo.innerText = tymy[cisloDruzstva].jmeno;
-                }
+            return `<span class="text-blue-600">${time}</span>`
+        }
 
-                function vykresliVsechno() {
-                    vykresliGolman(document.getElementById("golman").value);
-                    vykresliAsistenci(document.getElementById("asistent").value);
-                    vykresliDrustvo(index);
+        function getFormattedAssistence(player) {
+            if (!player) return "bez asistence";
 
-                    const events = JSON.parse(sessionStorage.getItem("events") ?? "[]");
-                    const goly = events.filter(event => event.id == "branka" || Boolean(event?.promenil));
-                    const golyDomaci = goly.filter(event => event.tym == 0).length;
-                    const golyHosti = goly.length - golyDomaci;
+            return `za asistence ${getPlayerFromTeam(player)}`;
+        }
 
-                    document.querySelectorAll(".stav").forEach(txt => txt.innerHTML = `${golyDomaci + !Number(index)}:${golyHosti + Number(index)}`);
-                }
+        const processors = {
+            "pole:golman": getPlayerFromTeam,
+            "pole:asistent": getFormattedAssistence,
+            "pole:cas": getFormattedTime,
+        }
 
-                document.querySelectorAll(`input[name="branka_tymu"]`).forEach(input => input.addEventListener("input", (event) => {
-                    index = Number(event.target.value);
-                    vykresliVsechno();
-                }));
+        getReactContent("Čas pole:cas, branku družstva pole:druzstvo vstřelil hráč pole:golman pole:asistent", processors, document.getElementById("zprava"));
+        getReactContent("data:domaci", {}, document.getElementById("domaci"));
+        getReactContent("data:hosti", {}, document.getElementById("hosti"));
 
-                document.getElementById("golman").addEventListener("input", (event) => {
-                    vykresliGolman(event.target.value);
-                })
+        document.querySelectorAll(`input[name="branka_tymu"]`).forEach(input => input.addEventListener("input", (event) => {
+            document.getElementById("golman").dispatchEvent(new Event("input"));
+            document.getElementById("asistent").dispatchEvent(new Event("input"));
+            document.getElementById("branka_tym").dispatchEvent(new Event("input"));
 
-                document.getElementById("asistent").addEventListener("input", (event) => {
-                    vykresliAsistenci(event.target.value);
-                })
+            document.getElementById("druzstvo").value = event.target.value;
+            console.log(event.target.value);
+        }));
 
-                document.getElementById("cas_branky").addEventListener("input", (event) => {
-                    let chars = event.target.value.split("");
-                    chars.splice(2, 0, ":");
-
-                    poleCas.innerText = chars.join("");
-                })
-
-                document.querySelectorAll(".domaci").forEach(txt => txt.innerHTML = res.tymy[indexDomaci].jmeno);
-                document.querySelectorAll(".hosti").forEach(txt => txt.innerHTML = res.tymy[indexHosti].jmeno);
-
-                vykresliVsechno();
-            })
     </script>
 </body>
 
